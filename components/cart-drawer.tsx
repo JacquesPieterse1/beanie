@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { Coffee } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
 import { Button } from "@/components/ui/button";
 import type { CartItem } from "@/types/database";
@@ -15,6 +16,12 @@ interface CartDrawerProps {
 
 export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { items, removeItem, updateQuantity, clearCart, total } = useCart();
+  const router = useRouter();
+
+  function handleCheckout() {
+    onClose();
+    router.push("/checkout");
+  }
 
   return (
     <AnimatePresence>
@@ -91,7 +98,10 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   </span>
                 </div>
 
-                <Button className="w-full rounded-xl py-6 text-base">
+                <Button
+                  onClick={handleCheckout}
+                  className="w-full rounded-xl py-6 text-base"
+                >
                   Checkout
                 </Button>
 
