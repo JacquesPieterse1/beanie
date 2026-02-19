@@ -77,6 +77,31 @@ export interface ProductWithCategory extends Product {
   category: Category;
 }
 
+export interface ModifierWithOptions extends Modifier {
+  modifier_options: ModifierOption[];
+}
+
 export interface OrderWithItems extends Order {
   order_items: (OrderItem & { product: Product })[];
 }
+
+// Cart types (client-side)
+
+export interface CartItemModifier {
+  modifier_id: string;
+  modifier_name: string;
+  option_id: string;
+  option_label: string;
+  price_adjustment: number;
+}
+
+export interface CartItem {
+  id: string; // unique cart line ID
+  product_id: string;
+  product_name: string;
+  product_image_url: string | null;
+  base_price: number;
+  modifiers: CartItemModifier[];
+  quantity: number;
+}
+

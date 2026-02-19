@@ -1,7 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import type { Category, Product } from "@/types/database";
 import { ProductCard } from "@/components/product-card";
+import { CategoryPills } from "@/components/category-pills";
+import { ProductDetailPanel } from "@/components/product-detail-panel";
+import { StaggerContainer, StaggerItem } from "@/components/motion";
 
 interface MenuGridProps {
   categories: Category[];
@@ -9,55 +14,109 @@ interface MenuGridProps {
 }
 
 export function MenuGrid({ categories, products }: MenuGridProps) {
-  // Group products by category
-  const grouped = categories
-    .map((category) => ({
-      category,
-      items: products.filter((p) => p.category_id === category.id),
-    }))
-    .filter((group) => group.items.length > 0);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Products with no matching category (safety net)
-  const uncategorised = products.filter(
-    (p) => !categories.some((c) => c.id === p.category_id)
-  );
+  const filtered = activeCategory
+    ? products.filter((p) => p.category_id === activeCategory)
+    : products;
 
-  if (grouped.length === 0 && uncategorised.length === 0) {
+  const grouped = activeCategory
+    ? null
+    : categories
+        .map((cat) => ({
+          category: cat,
+          items: products.filter((p) => p.category_id === cat.id),
+        }))
+        .filter((g) => g.items.length > 0);
+
+  const uncategorised = activeCategory
+    ? []
+    : products.filter((p) => !categories.some((c) => c.id === p.category_id));
+
+  if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-lg font-medium text-stone-400">
+        <p className="font-heading text-lg font-medium text-muted-foreground">
           No products on the menu yet.
         </p>
-        <p className="mt-1 text-sm text-stone-400">Check back soon!</p>
+        <p className="mt-1 text-sm text-muted-foreground">Check back soon!</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-12">
-      {grouped.map(({ category, items }) => (
-        <section key={category.id}>
-          <h2 className="mb-4 text-xl font-bold text-stone-800">
-            {category.name}
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </section>
-      ))}
+    <>
+      <div className="space-y-8">
+        <CategoryPills
+          categories={categories}
+          activeId={activeCategory}
+          onSelect={setActiveCategory}
+        />
 
-      {uncategorised.length > 0 && (
-        <section>
-          <h2 className="mb-4 text-xl font-bold text-stone-800">Other</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {uncategorised.map((product) => (
-              <ProductCard key={product.id} product={product} />
+        {activeCategory ? (
+          <StaggerContainer
+            key={activeCategory}
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {filtered.map((product) => (
+              <StaggerItem key={product.id}>
+                <ProductCard
+                  product={product}
+                  onClick={() => setSelectedProduct(product)}
+                />
+              </StaggerItem>
             ))}
+          </StaggerContainer>
+        ) : (
+          <div className="space-y-10">
+            {grouped?.map(({ category, items }) => (
+              <section key={category.id}>
+                <h2 className="mb-4 font-heading text-xl font-bold text-foreground">
+                  {category.name}
+                </h2>
+                <StaggerContainer className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((product) => (
+                    <StaggerItem key={product.id}>
+                      <ProductCard
+                        product={product}
+                        onClick={() => setSelectedProduct(product)}
+                      />
+                    </StaggerItem>
+                  ))}
+                </StaggerContainer>
+              </section>
+            ))}
+
+            {uncategorised.length > 0 && (
+              <section>
+                <h2 className="mb-4 font-heading text-xl font-bold text-foreground">
+                  Other
+                </h2>
+                <StaggerContainer className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {uncategorised.map((product) => (
+                    <StaggerItem key={product.id}>
+                      <ProductCard
+                        product={product}
+                        onClick={() => setSelectedProduct(product)}
+                      />
+                    </StaggerItem>
+                  ))}
+                </StaggerContainer>
+              </section>
+            )}
           </div>
-        </section>
-      )}
-    </div>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {selectedProduct && (
+          <ProductDetailPanel
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
