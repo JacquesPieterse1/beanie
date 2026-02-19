@@ -8,6 +8,7 @@ import {
   Loader2,
   PackageCheck,
 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase";
 import { updateOrderStatus } from "@/lib/actions/update-order-status";
 import { Button } from "@/components/ui/button";
@@ -172,8 +173,20 @@ function OrderCard({
 
   async function handleStatusChange(newStatus: OrderStatus) {
     setLoading(newStatus);
-    await updateOrderStatus(order.id, newStatus);
+    const result = await updateOrderStatus(order.id, newStatus);
     setLoading(null);
+    if (result.error) {
+      toast.error("Failed to update order", { description: result.error });
+    } else {
+      const labels: Record<string, string> = {
+        in_progress: "Order started",
+        complete: "Order marked complete",
+        cancelled: "Order cancelled",
+      };
+      toast.success(labels[newStatus] ?? "Status updated", {
+        description: `#${order.pickup_code}`,
+      });
+    }
   }
 
   const timeAgo = getTimeAgo(order.created_at);

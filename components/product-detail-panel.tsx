@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Coffee, Loader2, Minus, Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase";
 import { useCart } from "@/lib/cart-context";
 import { Button } from "@/components/ui/button";
@@ -129,6 +130,9 @@ export function ProductDetailPanel({
       base_price: Number(product.price),
       modifiers: selectedModifiers,
       quantity,
+    });
+    toast.success(`${product.name} added to cart`, {
+      description: quantity > 1 ? `${quantity} items` : undefined,
     });
     onClose();
   }

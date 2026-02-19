@@ -11,6 +11,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { useCart } from "@/lib/cart-context";
 import { placeOrder } from "@/lib/actions/place-order";
 import { Button } from "@/components/ui/button";
@@ -30,11 +31,13 @@ export default function CheckoutPage() {
 
     if (result.error) {
       setError(result.error);
+      toast.error("Failed to place order", { description: result.error });
       setLoading(false);
       return;
     }
 
     clearCart();
+    toast.success("Order placed!", { description: "Check your pickup code on the next page." });
     router.push(`/order/${result.orderId}`);
   }
 

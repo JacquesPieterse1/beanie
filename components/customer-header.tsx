@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AnimatedButton } from "@/components/motion";
 import { CartDrawer } from "@/components/cart-drawer";
+import { MobileCartBar } from "@/components/mobile-cart-bar";
 
 export function CustomerHeader() {
   const { user, profile, loading, signOut } = useUser();
@@ -90,6 +91,7 @@ export function CustomerHeader() {
       </header>
 
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+      <MobileCartBar onOpen={() => setCartOpen(true)} />
     </>
   );
 }

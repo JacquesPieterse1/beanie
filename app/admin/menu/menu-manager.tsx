@@ -9,6 +9,7 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -59,8 +60,13 @@ export function MenuManager({
 
   async function handleDelete(id: string) {
     setDeleting(id);
-    await deleteProduct(id);
+    const res = await deleteProduct(id);
     setDeleting(null);
+    if (res.error) {
+      toast.error("Failed to delete product", { description: res.error });
+    } else {
+      toast.success("Product deleted");
+    }
   }
 
   async function handleSubmit(data: {
@@ -75,9 +81,11 @@ export function MenuManager({
     if (editingProduct) {
       const res = await updateProduct(editingProduct.id, data);
       if (res.error) return res.error;
+      toast.success("Product updated", { description: data.name });
     } else {
       const res = await createProduct(data);
       if (res.error) return res.error;
+      toast.success("Product created", { description: data.name });
     }
     setDialogOpen(false);
     return null;
