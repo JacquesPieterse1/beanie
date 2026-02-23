@@ -17,6 +17,11 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
 
+  // Let the OAuth callback route pass through without interference
+  if (path.startsWith("/auth/callback")) {
+    return response;
+  }
+
   // Redirect authenticated users away from auth pages
   if (user && (path.startsWith("/login") || path.startsWith("/register"))) {
     return NextResponse.redirect(new URL("/", request.url));

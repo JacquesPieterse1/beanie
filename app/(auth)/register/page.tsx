@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageTransition } from "@/components/motion";
+import { GoogleAuthButton, AuthDivider } from "@/components/google-auth-button";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -66,7 +67,12 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* Form */}
+          {/* Google OAuth */}
+          <GoogleAuthButton label="Continue with Google" />
+
+          <AuthDivider />
+
+          {/* Email form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">

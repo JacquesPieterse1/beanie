@@ -2,13 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Coffee, LogIn, LogOut, ShoppingBag, User } from "lucide-react";
+import { ChevronDown, Coffee, LogIn, LogOut, Receipt, ShoppingBag, UserCog } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@/hooks/use-user";
 import { useCart } from "@/lib/cart-context";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AnimatedButton } from "@/components/motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CartDrawer } from "@/components/cart-drawer";
 import { MobileCartBar } from "@/components/mobile-cart-bar";
 
@@ -20,7 +27,7 @@ export function CustomerHeader() {
 
   async function handleSignOut() {
     await signOut();
-    router.refresh();
+    router.push("/login");
   }
 
   return (
@@ -60,24 +67,47 @@ export function CustomerHeader() {
               </AnimatePresence>
             </AnimatedButton>
 
-            {loading ? (
+            {!user &&loading ? (
               <div className="h-9 w-20 animate-pulse rounded-xl bg-muted" />
             ) : user ? (
-              <div className="flex items-center gap-2">
-                <span className="hidden text-sm text-muted-foreground sm:inline">
-                  <User className="mr-1 inline h-4 w-4" />
-                  {profile?.full_name || user.email}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="gap-1.5 text-muted-foreground"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Sign out</span>
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 rounded-xl text-muted-foreground"
+                  >
+                    <span className="max-w-[120px] truncate text-sm">
+                      Hi, {profile?.full_name?.split(" ")[0] || "there"}
+                    </span>
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                  <DropdownMenuItem
+                    onClick={() => router.push("/account")}
+                    className="cursor-pointer gap-2 rounded-lg"
+                  >
+                    <UserCog className="h-4 w-4" />
+                    Account details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/orders")}
+                    className="cursor-pointer gap-2 rounded-lg"
+                  >
+                    <Receipt className="h-4 w-4" />
+                    Previous orders
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="cursor-pointer gap-2 rounded-lg text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button asChild size="sm" className="gap-1.5 rounded-xl">
                 <Link href="/login">

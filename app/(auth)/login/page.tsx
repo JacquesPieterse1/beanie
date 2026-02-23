@@ -1,24 +1,34 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Coffee, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageTransition } from "@/components/motion";
+import { GoogleAuthButton, AuthDivider } from "@/components/google-auth-button";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") ?? "/";
+  const oauthError = searchParams.get("error");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Show toast if redirected back with an OAuth error
+  useEffect(() => {
+    if (oauthError) {
+      toast.error("Authentication failed", { description: oauthError });
+    }
+  }, [oauthError]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,7 +67,12 @@ function LoginForm() {
           </p>
         </div>
 
-        {/* Form */}
+        {/* Google OAuth */}
+        <GoogleAuthButton label="Continue with Google" />
+
+        <AuthDivider />
+
+        {/* Email form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">

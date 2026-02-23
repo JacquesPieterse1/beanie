@@ -9,7 +9,7 @@ interface UseUserReturn {
   user: User | null;
   profile: Profile | null;
   role: AppRole | null;
-  loading: boolean;
+  loading: boolean; // loading auth, not profile
   signOut: () => Promise<void>;
 }
 
@@ -18,51 +18,125 @@ export function useUser(): UseUserReturn {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   const supabase = createClient();
+  //   let cancelled = false;
+
+  //   async function fetchProfile(userId: string) {
+  //     const { data, error } = await supabase
+  //       .from("profiles")
+  //       .select("*")
+  //       .eq("id", userId)
+  //       .maybeSingle(); // ✅ doesn’t throw when row doesn’t exist
+
+  //     if (cancelled) return;
+
+  //     if (error) {
+  //       // Don’t block UI if profile fails (RLS/missing row)
+  //       console.warn("Profile fetch error:", error.message);
+  //       setProfile(null);
+  //       return;
+  //     }
+  //     // 🔥 If user exists in auth but no profile row exists
+  //     if (!data) {
+  //       console.warn("No profile found — signing out");
+  //       await supabase.auth.signOut();
+  //       setUser(null);
+  //       setProfile(null);
+  //       return;
+  //     }
+  //     setProfile((data as Profile) ?? null);
+  //   }
+
+  //   async function init() {
+  //     const { data } = await supabase.auth.getSession();
+  //     if (cancelled) return;
+
+  //     const u = data.session?.user ?? null;
+
+  //     setUser(u);
+  //     setLoading(false);
+
+  //     if (u) {
+  //       fetchProfile(u.id);
+  //     } else {
+  //       setProfile(null);
+  //     }
+  //   }
+
+  //   init();
+
+  //   const { data: authListener } = supabase.auth.onAuthStateChange(
+  //     async (_event, session) => {
+  //       const u = session?.user ?? null;
+  //       setUser(u);
+  //       setLoading(false);
+
+  //       if (u) {
+  //         await fetchProfile(u.id);
+  //       } else {
+  //         setProfile(null);
+  //       }
+  //     }
+  //   );
+
+  //   return () => {
+  //     cancelled = true;
+  //     authListener.subscription.unsubscribe();
+  //   };
+  // }, []);
+
   useEffect(() => {
-    const supabase = createClient();
+  const supabase = createClient();
+  let cancelled = false;
 
-    async function loadUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  async function loadAuth() {
+    const { data } = await supabase.auth.getSession();
 
-      if (user) {
-        setUser(user);
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-        setProfile(data as Profile | null);
-      }
+    if (cancelled) return;
 
-      setLoading(false);
+    const sessionUser = data.session?.user ?? null;
+
+    setUser(sessionUser);
+    setLoading(false);
+
+    if (!sessionUser) {
+      setProfile(null);
+      return;
     }
 
-    loadUser();
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", sessionUser.id)
+      .single();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
+    if (cancelled) return;
 
-      if (currentUser) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", currentUser.id)
-          .single();
-        setProfile(data as Profile | null);
-      } else {
-        setProfile(null);
-      }
+    setProfile(profileData ?? null);
+  }
 
-      setLoading(false);
-    });
+  loadAuth();
 
-    return () => subscription.unsubscribe();
-  }, []);
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange(() => {
+    loadAuth();
+  });
+
+  return () => {
+    cancelled = true;
+    subscription.unsubscribe();
+  };
+}, []);
+
+  useEffect(() => {
+  console.log("USER:", user);
+}, [user]);
+
+useEffect(() => {
+  console.log("PROFILE:", profile);
+}, [profile]);
 
   async function signOut() {
     const supabase = createClient();
