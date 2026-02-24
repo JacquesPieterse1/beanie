@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: "/admin/menu", label: "Menu Management", icon: UtensilsCrossed },
   { href: "/admin/orders", label: "Order History", icon: ScrollText },
-  { href: "/staff/dashboard", label: "Order Queue", icon: ClipboardList },
+  { href: "/admin/queue", label: "Order Queue", icon: ClipboardList },
 ];
 
 export function AdminSidebar() {
