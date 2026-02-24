@@ -1,31 +1,13 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextRequest, NextResponse } from "next/server";
-
-export function createMiddlewareClient(request: NextRequest) {
-  let response = NextResponse.next({ request: { headers: request.headers } });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  return { supabase, response };
-}
+/**
+ * This helper is no longer used.
+ *
+ * The Supabase middleware client is now created inline in middleware.ts to
+ * avoid the stale `response` reference bug: when createMiddlewareClient()
+ * returned `{ supabase, response }`, the caller destructured `response` once.
+ * Later, when getUser() triggered setAll() and reassigned the internal `let
+ * response` variable, the caller's copy became stale — refreshed session
+ * cookies were never forwarded to the browser.
+ *
+ * See middleware.ts for the correct inline implementation.
+ */
+export {};
