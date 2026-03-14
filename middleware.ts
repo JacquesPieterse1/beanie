@@ -96,9 +96,6 @@ export async function middleware(request: NextRequest) {
    * the next request will fail auth — causing a redirect loop or a silent
    * fallback to the "unauthenticated" code path.
    */
-  console.log("MIDDLEWARE PATH:", path);
-  console.log("MIDDLEWARE USER:", user?.id);
-  console.log("MIDDLEWARE ROLE:", user?.app_metadata?.role);
   const makeRedirect = (destination: string): NextResponse => {
     const url = new URL(destination, request.url);
     // Guard against same-path redirect loops.

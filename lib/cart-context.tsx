@@ -25,7 +25,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "beanie-cart";
 
 function generateId() {
-  return Math.random().toString(36).slice(2, 10);
+  return crypto.randomUUID();
 }
 
 function itemPrice(item: CartItem) {

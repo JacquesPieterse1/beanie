@@ -130,14 +130,6 @@ export function useUser(): UseUserReturn {
   };
 }, []);
 
-  useEffect(() => {
-  console.log("USER:", user);
-}, [user]);
-
-useEffect(() => {
-  console.log("PROFILE:", profile);
-}, [profile]);
-
   async function signOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
