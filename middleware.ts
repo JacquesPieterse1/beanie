@@ -136,17 +136,6 @@ export async function middleware(request: NextRequest) {
   const resolveRole = async (): Promise<AppRole> => {
     if (!user) return "customer";
 
-    // Fast path: role already embedded in the JWT.
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    const role = (profile?.role as AppRole) ?? "customer";
-    //if (metaRole && metaRole in ROLE_HOME) return metaRole;
-
-    // Slow path: single DB query, always with a safe default.
     const { data } = await supabase
       .from("profiles")
       .select("role")

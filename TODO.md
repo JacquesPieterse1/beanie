@@ -7,7 +7,7 @@
 - [x] **Pickup code collisions** — 4-digit numeric codes (10,000 values) will collide in a busy cafe. Use alphanumeric codes or a longer format.
 - [x] **Cart ID generation** — Replace `Math.random().toString(36)` with `crypto.randomUUID()` for reliable uniqueness.
 - [x] **Remove debug logs** — `console.log` calls in `middleware.ts` and `use-user.ts` log user data on every request in production.
-- [ ] **Fix double DB query in middleware** — Profiles table is queried twice on every request for role resolution. Cache the result or use a single query.
+- [x] **Fix double DB query in middleware** — Profiles table is queried twice on every request for role resolution. Cache the result or use a single query.
 
 ### Missing Validation
 - [ ] **Add input validation with Zod** — Server actions (`placeOrder`, `createProduct`, etc.) accept raw input with no schema validation. Add Zod to all server actions.
