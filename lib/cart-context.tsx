@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import type { CartItem, CartItemModifier } from "@/types/database";
+import { createClient } from "@/lib/supabase";
 
 interface CartContextValue {
   items: CartItem[];
@@ -61,6 +62,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }
   }, [items, hydrated]);
+
+  // Clear cart on sign-out
+  useEffect(() => {
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        setItems([]);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const addItem = useCallback((newItem: Omit<CartItem, "id">) => {
     setItems((prev) => {
