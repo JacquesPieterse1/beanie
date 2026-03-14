@@ -4,7 +4,10 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import type { CartItem } from "@/types/database";
 
 function generatePickupCode() {
-  return String(Math.floor(1000 + Math.random() * 9000));
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // excludes ambiguous 0/O, 1/I/L
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => chars[b % chars.length]).join("");
 }
 
 interface PlaceOrderInput {
