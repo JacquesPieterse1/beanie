@@ -18,8 +18,8 @@
 ## Medium Priority
 
 ### Code Quality
-- [ ] **Remove commented-out code in `use-user.ts`** — ~65 lines of old auth logic sitting in comments. Delete it or move to a branch.
-- [ ] **Add global error boundary** — No top-level React error boundary; unhandled server action failures show a blank screen.
+- [x] **Remove commented-out code in `use-user.ts`** — ~65 lines of old auth logic sitting in comments. Delete it or move to a branch.
+- [x] **Add global error boundary** — No top-level React error boundary; unhandled server action failures show a blank screen.
 - [ ] **Add environment variable validation** — Validate `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` at startup (e.g., using `zod` or `t3-env`). Add a `.env.example` file.
 
 ### Performance
