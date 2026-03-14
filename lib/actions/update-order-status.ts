@@ -1,12 +1,20 @@
 "use server";
 
+import { z } from "zod";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import type { OrderStatus } from "@/types/database";
+
+const UpdateOrderStatusSchema = z.object({
+  orderId: z.string().uuid("Invalid order ID"),
+  status: z.enum(["pending", "in_progress", "complete", "cancelled"]),
+});
 
 export async function updateOrderStatus(
   orderId: string,
-  status: OrderStatus
+  status: z.infer<typeof UpdateOrderStatusSchema>["status"]
 ) {
+  const parsed = UpdateOrderStatusSchema.safeParse({ orderId, status });
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
   const supabase = await createServerSupabaseClient();
 
   const {

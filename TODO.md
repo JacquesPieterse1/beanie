@@ -10,8 +10,8 @@
 - [x] **Fix double DB query in middleware** — Profiles table is queried twice on every request for role resolution. Cache the result or use a single query.
 
 ### Missing Validation
-- [ ] **Add input validation with Zod** — Server actions (`placeOrder`, `createProduct`, etc.) accept raw input with no schema validation. Add Zod to all server actions.
-- [ ] **Validate modifier constraints on checkout** — `placeOrder` doesn't verify that selected modifiers actually belong to the ordered products.
+- [x] **Add input validation with Zod** — Server actions (`placeOrder`, `createProduct`, etc.) accept raw input with no schema validation. Add Zod to all server actions.
+- [x] **Validate modifier constraints on checkout** — `placeOrder` doesn't verify that selected modifiers actually belong to the ordered products.
 
 ---
 

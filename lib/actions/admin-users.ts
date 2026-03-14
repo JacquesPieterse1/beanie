@@ -1,8 +1,13 @@
 "use server";
 
+import { z } from "zod";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import type { AppRole } from "@/types/database";
 import { revalidatePath } from "next/cache";
+
+const UpdateUserRoleSchema = z.object({
+  userId: z.string().uuid("Invalid user ID"),
+  newRole: z.enum(["customer", "staff", "admin"]),
+});
 
 export async function listUsers() {
   const supabase = await createServerSupabaseClient();
@@ -15,7 +20,10 @@ export async function listUsers() {
   return { users: data };
 }
 
-export async function updateUserRole(userId: string, newRole: AppRole) {
+export async function updateUserRole(userId: string, newRole: z.infer<typeof UpdateUserRoleSchema>["newRole"]) {
+  const parsed = UpdateUserRoleSchema.safeParse({ userId, newRole });
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
   const supabase = await createServerSupabaseClient();
 
   const {
