@@ -8,6 +8,7 @@ import {
   LogOut,
   Menu,
   ScrollText,
+  Users,
   UtensilsCrossed,
   X,
 } from "lucide-react";
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { href: "/admin/menu", label: "Menu Management", icon: UtensilsCrossed },
   { href: "/admin/orders", label: "Order History", icon: ScrollText },
   { href: "/admin/queue", label: "Order Queue", icon: ClipboardList },
+  { href: "/admin/users", label: "User Management", icon: Users },
 ];
 
 export function AdminSidebar() {
